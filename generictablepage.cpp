@@ -39,7 +39,7 @@ void GenericTablePage::on_tableW_itemChanged(QTableWidgetItem *item)
 
 
 }
-#define TRYCONV_ERR(call,errcaption) try{call;bret = true;}catch(const std::invalid_argument& ivex){QMessageBox(QMessageBox::Icon::Critical,"Input Error",QString(errcaption + QString(": ") + QString::fromLatin1(ivex.what(),strlen(ivex.what()))),QMessageBox::Ok,this).exec();bret = false;break;}
+#define TRYCONV_ERR(call,errcaption) try{call;bret = true;}catch(const std::invalid_argument& ivex){QMessageBox(QMessageBox::Icon::Critical,"Input Error",QString(errcaption + QString(": ") + QString::fromLatin1(ivex.what(),(int)strlen(ivex.what()))),QMessageBox::Ok,this).exec();bret = false;break;}
 
 bool GenericTablePage::Eval(const GString &vstr, const EDataType &type)
 {
@@ -52,7 +52,7 @@ bool GenericTablePage::Eval(const GString &vstr, const EDataType &type)
                 bret = true;
             }
             catch (const std::invalid_argument& ivex) {
-               QMessageBox(QMessageBox::Icon::Critical,"Error",QString("Cannot convert to 64 bit integer." + QString(": ") + QString::fromLatin1(ivex.what(),strlen(ivex.what()))),QMessageBox::Ok,this).exec();
+               QMessageBox(QMessageBox::Icon::Critical,"Error",QString("Cannot convert to 64 bit integer." + QString(": ") + QString::fromLatin1(ivex.what(),(int)strlen(ivex.what()))),QMessageBox::Ok,this).exec();
                 // Stop the compiler whining about unused variables with this useless function call.
                 ivex.what();
             }
