@@ -1,0 +1,26 @@
+<RCC>
+    <qresource prefix="/ico">
+        <file>treeicons/database64.png</file>
+        <file>treeicons/table64.png</file>
+        <file>zediticopng.png</file>
+        <file>treeicons/strtabico64.png</file>
+        <file>treeicons/strtabroot64.png</file>
+    </qresource>
+    <qresource prefix="/">
+        <file>acticons/fopen64.png</file>
+        <file>acticons/save64.png</file>
+        <file>treeicons/add64.png</file>
+        <file>treeicons/dupe64.png</file>
+        <file>acticons/remove64.png</file>
+        <file>acticons/acol64.png</file>
+        <file>acticons/coledit64.png</file>
+        <file>acticons/zoom64.png</file>
+        <file>treeicons/table24.png</file>
+        <file>acticons/cleart64.png</file>
+        <file>acticons/ecsv64.png</file>
+        <file>acticons/icsv64.png</file>
+        <file>treeicons/strtab24.png</file>
+        <file>acticons/saveas64.png</file>
+        <file>acticons/vtable64.png</file>
+    </qresource>
+</RCC>
