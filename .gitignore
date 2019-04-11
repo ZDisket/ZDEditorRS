@@ -42,4 +42,5 @@ CMakeLists.txt.user*
 *.gst
 *.csv
 
-rdeployed/*
+rdeployed/*.exe
+rdeployed/*.bin
