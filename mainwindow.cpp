@@ -50,7 +50,7 @@ ui->splitter->setSizes(QList<int>() << 350 << 90);
            statusProgressBar = new QProgressBar(this);
     QLabel* versionLabel = new QLabel(this);
     gpPgBar = statusProgressBar;
-    versionLabel->setText("V1.1");
+    versionLabel->setText("V1.2");
            // set text for the label
        statusLabel->setText("Loading to table..........");
           statusLabel->setMinimumSize(QSize(125,12));
@@ -727,6 +727,7 @@ int MainWindow::findTab(const QString &name)
 void MainWindow::on_tabWidget_currentChanged(int index)
 {
     GenericTablePage* ptp = (GenericTablePage*)ui->tabWidget->widget(index);
+
     if (!ptp)
         return;
 
@@ -747,7 +748,7 @@ void MainWindow::on_tabWidget_tabCloseRequested(int index)
 
     ui->tabWidget->removeTab(index);
     delete gtpDestroy;
-    gtpDestroy = NULL;
+    gtpDestroy = nullptr;
 
     if (ui->tabWidget->count() == 0)
         ui->menuTable->setEnabled(false);
@@ -1052,7 +1053,7 @@ void MainWindow::on_actionICSV_triggered()
         DelimLine.AddDelimiter(L",");
 
 
-        if (DelimLine.szTokens() != Table->columnCount())
+        if (DelimLine.szTokens() != (size_t)Table->columnCount())
         {
             GString msg(L"Cannot import from this file, it is invalid. Expected " + GString(Table->columnCount()) + L" columns, got " + GString((int)DelimLine.szTokens()) + L" cols");
 
@@ -1067,23 +1068,42 @@ void MainWindow::on_actionICSV_triggered()
 
       vector<GString>::iterator lIt = inLines.begin();
 
-      Table->setRowCount((int)inLines.size());
+      //Pre-check the file for empty lines
+      int fullLines = 0;
+      while (lIt != inLines.end())
+   {
+
+      if (!lIt->empty())
+          ++fullLines;
+
+      ++lIt;
+      }
+
+      Table->setRowCount(fullLines);
 
       int l = 0;
       nullh.clear();
 
-        nullh.reserve((int)inLines.size());
+        nullh.reserve(fullLines);
+
+        // Reset the iterator
+      lIt = inLines.begin();
 
         Table->blockSignals(true);
         while (lIt != inLines.end())
      {
         GString& Line = *lIt;
+        if (Line.empty()){
+            ++lIt;
+            continue;
+        }
+
        ZStringDelimiter dLine(Line);
         dLine.AddDelimiter(L",");
 
         if (dLine.szTokens() != (size_t)Table->columnCount())
         {
-            GString msg(L"Cannot import from this file, it is invalid. Expected " + GString(Table->columnCount()) + L" columns, got " + GString((int)DelimLine.szTokens()) + L" cols at line " + GString((int)l));
+            GString msg(L"Could only partially import from this file, it is invalid. Expected " + GString(Table->columnCount()) + L" columns, got " + GString((int)DelimLine.szTokens()) + L" cols at line " + GString((int)l));
 
             SError(QString::fromStdWString(msg));
 
@@ -1257,7 +1277,7 @@ void MainWindow::on_actVtable_triggered()
     int errors = 0;
     int pv = 0;
     const int rows = Table->rowCount();
-   const int cols = Table->columnCount();
+    const int cols = Table->columnCount();
 
     std::vector<std::string> FileLines;
 
