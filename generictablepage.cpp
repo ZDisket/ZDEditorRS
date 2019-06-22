@@ -4,7 +4,7 @@
 #include <QMessageBox>
 #include <golem_string.h>
 #include <limits.h>
-
+#include <QDebug>
 GenericTablePage::GenericTablePage(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::GenericTablePage)
@@ -150,5 +150,14 @@ void GenericTablePage::FindUndo(QTableWidgetItem *pItem)
 
     pTable->blockSignals(false);
 
+
+}
+
+void GenericTablePage::on_tableW_currentItemChanged(QTableWidgetItem *current, QTableWidgetItem *previous)
+{
+    if (!previous || !current)
+        return;
+
+ //   qDebug() << previous->text() << " -> " << current->text();
 
 }

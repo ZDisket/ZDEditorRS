@@ -27,6 +27,8 @@ private slots:
 
     void on_tableW_itemChanged(QTableWidgetItem *item);
 
+    void on_tableW_currentItemChanged(QTableWidgetItem *current, QTableWidgetItem *previous);
+
 private:
     bool Eval(const GString & vstr, const EDataType & type);
     Ui::GenericTablePage *ui;

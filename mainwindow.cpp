@@ -43,14 +43,14 @@ loading = false;
  The government is a lie. Life is a lie.
  EVERYTHING IS A LIE
 */
-ui->splitter->setSizes(QList<int>() << 350 << 90);
+ui->splitter->setSizes(QList<int>() << 350 << 200);
 
 
     statusLabel = new QLabel(this);
            statusProgressBar = new QProgressBar(this);
     QLabel* versionLabel = new QLabel(this);
     gpPgBar = statusProgressBar;
-    versionLabel->setText("V1.2");
+    versionLabel->setText("V1.3");
            // set text for the label
        statusLabel->setText("Loading to table..........");
           statusLabel->setMinimumSize(QSize(125,12));
@@ -495,7 +495,7 @@ void MainWindow::SaveCTChanges()
     if (OpenTables.empty())
         return;
 
-    if (Table == NULL)
+    if (Table == nullptr)
         return;
 
     statusProgressBar->setRange(0,Table->columnCount() * Table->rowCount());
@@ -531,7 +531,7 @@ void MainWindow::SaveCTChanges()
 
 
             if (ACol.dataType == EDataType::e_Double){
-                double num = stod(MStr);
+                double num = ZTUtil::IStrStreamConv<double>(MStr);
 
                 wostringstream ss;
                 ss << num;
@@ -540,7 +540,8 @@ void MainWindow::SaveCTChanges()
             }
 
             if (ACol.dataType == EDataType::e_Decimal || ACol.dataType == EDataType::e_Numeric){
-                INT64 num = stoll(MStr);
+                INT64 num = ZTUtil::IStrStreamConv<INT64>(MStr);
+
 
                 wostringstream ss;
                 ss << num;
@@ -551,7 +552,7 @@ void MainWindow::SaveCTChanges()
 
             if (ACol.dataType == EDataType::e_Float){
 
-                float num = stof(MStr);
+                float num = ZTUtil::IStrStreamConv<float>(MStr);
 
                 wostringstream ss;
                 ss << num;
@@ -753,6 +754,7 @@ void MainWindow::on_tabWidget_tabCloseRequested(int index)
     if (ui->tabWidget->count() == 0)
         ui->menuTable->setEnabled(false);
 
+    Table = nullptr;
 }
 
 ZTable MainWindow::ZTFromStrEntry(const GString &strename, vector<StrEntry> &strev)
@@ -1313,7 +1315,7 @@ void MainWindow::on_actVtable_triggered()
 
             try {
                 if (ACol.dataType == EDataType::e_Double){
-                    double num = stod(MStr);
+                    double num = ZTUtil::IStrStreamConv<double>(MStr);
 
                     wostringstream ss;
                     ss << num;
@@ -1322,7 +1324,8 @@ void MainWindow::on_actVtable_triggered()
                 }
 
                 if (ACol.dataType == EDataType::e_Decimal || ACol.dataType == EDataType::e_Numeric){
-                    INT64 num = stoll(MStr);
+                    INT64 num = ZTUtil::IStrStreamConv<INT64>(MStr);
+
 
                     wostringstream ss;
                     ss << num;
@@ -1333,7 +1336,7 @@ void MainWindow::on_actVtable_triggered()
 
                 if (ACol.dataType == EDataType::e_Float){
 
-                    float num = stof(MStr);
+                    float num = ZTUtil::IStrStreamConv<float>(MStr);
 
                     wostringstream ss;
                     ss << num;
@@ -1532,4 +1535,15 @@ void MainWindow::on_actAMulCol_triggered()
 void MainWindow::on_actionAssociate_file_format_triggered()
 {
     Associate();
+}
+
+template<typename Tp>
+Tp ZTUtil::IStrStreamConv(const wstring &Arg)
+{
+   Tp ret;
+    wistringstream wiss(Arg);
+    wiss >> ret;
+    return ret;
+
+
 }

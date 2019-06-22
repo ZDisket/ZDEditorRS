@@ -13,6 +13,11 @@
 #include <utility>
 #include "searchwindow.h"
 
+namespace ZTUtil{
+template<typename Tp>
+Tp IStrStreamConv(const std::wstring& Arg);
+
+}
 namespace Ui {
 class MainWindow;
 }
@@ -35,6 +40,8 @@ public:
     void umax(int in);
 
     void ResetEntry(QTableWidgetItem* pItem);
+
+
 private slots:
     void on_actionOpen_triggered();
 
@@ -118,6 +125,8 @@ private:
     QTreeWidgetItem* addTreeChild(QTreeWidgetItem *parent,QString name,QIcon ico);
     QLabel* statusLabel;
     QProgressBar* statusProgressBar;
+
+    QTreeWidget* treeUndo;
 
     void SError(const QString& caption,const QString& title = "Error" );
     Ui::MainWindow *ui;
