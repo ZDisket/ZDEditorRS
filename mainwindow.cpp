@@ -50,7 +50,7 @@ ui->splitter->setSizes(QList<int>() << 350 << 200);
            statusProgressBar = new QProgressBar(this);
     QLabel* versionLabel = new QLabel(this);
     gpPgBar = statusProgressBar;
-    versionLabel->setText("V1.3");
+    versionLabel->setText("V1.3A");
            // set text for the label
        statusLabel->setText("Loading to table..........");
           statusLabel->setMinimumSize(QSize(125,12));
@@ -1237,6 +1237,10 @@ void MainWindow::on_actionSave_As_triggered()
 
     ZStringDelimiter DelimPath(sfname.toStdWString());
     DelimPath.AddDelimiter(PDelim);
+
+    if (!DelimPath.szTokens())
+        DelimPath.AddDelimiter(L"/");
+
     CurrentFullFilePath = QString::fromStdWString(DelimPath.Reassemble(L"\\"));
 
 
