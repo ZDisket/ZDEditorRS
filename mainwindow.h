@@ -77,6 +77,8 @@ private slots:
 
     void on_actionAssociate_file_format_triggered();
 
+    void on_actGoToStrT_triggered();
+
 private:
     DBManager Database;
     ZDFS FileSys;

@@ -22,5 +22,6 @@
         <file>treeicons/strtab24.png</file>
         <file>acticons/saveas64.png</file>
         <file>acticons/vtable64.png</file>
+        <file>acticons/gotostrt64.png</file>
     </qresource>
 </RCC>

@@ -155,6 +155,7 @@
    <addaction name="actionAdd"/>
    <addaction name="actionDuplicate"/>
    <addaction name="actionRemove"/>
+   <addaction name="actGoToStrT"/>
    <addaction name="separator"/>
    <addaction name="actionSearch"/>
    <addaction name="actionEdit_Columns"/>
@@ -321,6 +322,21 @@
    </property>
    <property name="toolTip">
     <string>Add multiple columns, only for RELATIONS tables.</string>
+   </property>
+  </action>
+  <action name="actGoToStrT">
+   <property name="icon">
+    <iconset resource="res/main.qrc">
+     <normaloff>:/acticons/gotostrt64.png</normaloff>:/acticons/gotostrt64.png</iconset>
+   </property>
+   <property name="text">
+    <string>Go To String Table Entry</string>
+   </property>
+   <property name="toolTip">
+    <string>Selecting a String ID, try to find it in an open string table or where it is used if in a string table</string>
+   </property>
+   <property name="shortcut">
+    <string>Shift+S</string>
    </property>
   </action>
  </widget>

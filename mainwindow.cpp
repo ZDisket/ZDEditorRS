@@ -50,7 +50,7 @@ ui->splitter->setSizes(QList<int>() << 350 << 200);
            statusProgressBar = new QProgressBar(this);
     QLabel* versionLabel = new QLabel(this);
     gpPgBar = statusProgressBar;
-    versionLabel->setText("V1.3A");
+    versionLabel->setText("V1.4");
            // set text for the label
        statusLabel->setText("Loading to table..........");
           statusLabel->setMinimumSize(QSize(125,12));
@@ -1549,5 +1549,180 @@ Tp ZTUtil::IStrStreamConv(const wstring &Arg)
     wiss >> ret;
     return ret;
 
+
+}
+
+void MainWindow::on_actGoToStrT_triggered()
+{
+
+    if (!Table)
+        return;
+
+    QList<QTableWidgetItem*> Seli = Table->selectedItems();
+    if (!Seli.size())
+        return;
+
+    QColor qtHigh(255,0,0);
+
+
+    // If it's a string table, find where this STRID is used
+    if (GetCurrentTable().GetName().find(L".gst") != GString::npos)
+    {
+        Status("Finding where this string ID is being used...");
+        const QString stid = Table->item(Seli[0]->row(),0)->text();
+
+        const int tcount = ui->tabWidget->count();
+        int tgr = 0; int tgc = 0;
+        bool found = false;
+        GenericTablePage* Gtp = nullptr;
+        QTableWidget* Tb = nullptr;
+        int tgt = 0;
+
+        for (int t = 0; t < tcount;++t)
+        {
+
+            // skip string tables
+            if (ui->tabWidget->tabText(t).contains(".gst",Qt::CaseInsensitive))
+                continue;
+
+       Gtp = (GenericTablePage*)ui->tabWidget->widget(t);
+        if (!Gtp)
+            continue;
+
+         Tb = Gtp->pTable;
+
+
+        for (int c = 0;c < Tb->columnCount();++c)
+        {
+            for (int r = 0; r < Tb->rowCount();++r)
+            {
+                if (Tb->item(r,c)->text() == stid){
+                    tgc = c;
+                    tgr = r;
+                    found = true;
+                    break;
+
+                }
+
+
+            }
+
+            if (found)
+                break;
+
+        }
+
+
+        if (found){
+        tgt = t;
+        break;
+
+        }
+
+
+        }
+        if (found)
+        {
+            ui->tabWidget->setCurrentIndex(tgt);
+            Tb->scrollToItem(Tb->item(tgr,tgc),QAbstractItemView::ScrollHint::PositionAtCenter);
+
+            QModelIndex index = Tb->model()->index(tgr, tgc);
+            Tb->selectionModel()->select(index, QItemSelectionModel::ClearAndSelect);
+
+
+        }else{
+            QMessageBox msgBox;
+          //  msgBox.setStyle(ui->centralWidget->style());
+            msgBox.setWindowTitle("Note");
+            msgBox.setText("Could not find this StrID being used in any of the open tables");
+            msgBox.setIcon(QMessageBox::Information);
+
+            msgBox.exec();
+
+        }
+
+        Status("Ready");
+
+    }else{
+        Status("Finding where in the string table this STRID is...");
+        const QString stid = Table->item(Seli[0]->row(),Seli[0]->column())->text();
+
+        // We need a conversion to number with try/catch block to make sure we got a good ID number
+        try{
+
+            std::stoi(stid.toStdWString().c_str());
+
+        }catch (...){
+
+            SError("The selected cell does not appear to be a valid numerical String ID.");
+
+            return;
+        }
+
+        const int tcount = ui->tabWidget->count();
+        int tidst = -1;
+
+        for (int t = 0; t < tcount;++t)
+        {
+            if (ui->tabWidget->tabText(t).contains(".gst",Qt::CaseInsensitive))
+                tidst = t;
+
+
+        }
+
+        if (tidst == -1){
+            SError("No string table open. Please open a string table so that it appears on the tab list and try again");
+            return;
+        }
+
+
+
+        GenericTablePage* Gtp = (GenericTablePage*)ui->tabWidget->widget(tidst);
+        if (!Gtp)
+            return;
+
+        QTableWidget* Tb = Gtp->pTable;
+        int tgr = 0; int tgc = 0;
+        bool found = false;
+
+        for (int r = 0;r < Tb->rowCount();++r)
+        {
+            if (Tb->item(r,0)->text() == stid){
+                tgr = r;
+                found = true;
+
+                break;
+
+            }
+
+
+
+        }
+        if (found)
+        {
+            ui->tabWidget->setCurrentIndex(tidst);
+            Tb->scrollToItem(Tb->item(tgr,tgc),QAbstractItemView::ScrollHint::PositionAtCenter);
+
+            QModelIndex index = Tb->model()->index(tgr, tgc);
+            Tb->selectionModel()->select(index, QItemSelectionModel::ClearAndSelect);
+
+
+
+
+        }else{
+            QMessageBox msgBox;
+          //  msgBox.setStyle(ui->centralWidget->style());
+            msgBox.setWindowTitle("Note");
+            msgBox.setText("Could not find this StrID in the open string table " + ui->tabWidget->tabText(tidst));
+            msgBox.setIcon(QMessageBox::Information);
+
+            msgBox.exec();
+
+        }
+
+
+    }
+
+    Status("Ready");
 
 }
