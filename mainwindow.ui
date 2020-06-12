@@ -118,6 +118,7 @@
     <addaction name="actionOpen"/>
     <addaction name="actionSave"/>
     <addaction name="actionSave_As"/>
+    <addaction name="actionExport_Region_Control"/>
    </widget>
    <widget class="QMenu" name="menuTable">
     <property name="enabled">
@@ -337,6 +338,17 @@
    </property>
    <property name="shortcut">
     <string>Shift+S</string>
+   </property>
+  </action>
+  <action name="actionExport_Region_Control">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Export Region Control</string>
+   </property>
+   <property name="toolTip">
+    <string>aercl</string>
    </property>
   </action>
  </widget>

@@ -1,5 +1,5 @@
-#include "ZDFS.h"
 
+#include "ZDFS.h"
 
 bool ZDFS::WinBoolToStdBool(const BOOL& in_bInput)
 {
@@ -89,8 +89,10 @@ void ZDFS::EvalAddItemW(const WIN32_FIND_DATAW & in_FinData, std::vector<SItemW>
 
 	if (Item.Name == L".." || Item.Name == L".") { return; }
 
-	if (in_FinData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) { Item.IType = ZFS_TFOLDER; }
-	else { Item.IType = ZFS_TFILE; }
+	if (in_FinData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+		Item.IType = ZFS_TFOLDER;
+	else
+		Item.IType = ZFS_TFILE; 
 
 	// Fill out attributes
 
@@ -251,6 +253,65 @@ std::vector<SItemW> ZDFS::StuffInDirectory(const std::wstring & in_sPath,std::ws
 		}
 	}
 	return l_vStuff;
+
+}
+
+std::vector<SItemW> ZDFS::RecursiveStuffInDirectory(const std::wstring & in_sPath, std::wstring wFilter)
+{
+	std::vector<SItemW> l_vStuff;
+
+	WIN32_FIND_DATAW l_FindData;
+
+	std::wstring NewPath = in_sPath + L"\\" + wFilter;
+	HANDLE hFind = FindFirstFileW(NewPath.c_str(), &l_FindData);
+	if (hFind == INVALID_HANDLE_VALUE) { return l_vStuff; }
+	EvalAddItemW(l_FindData, l_vStuff);
+
+	if (hFind != INVALID_HANDLE_VALUE)
+	{
+		while (FindNextFileW(hFind, &l_FindData) != 0)
+		{
+			EvalAddItemW(l_FindData, l_vStuff);
+
+		}
+		if (GetLastError() == ERROR_NO_MORE_FILES) {
+			FindClose(hFind);
+		}
+	}
+
+	// Iter thru our entries and if it's a directory, repeat again.
+
+	auto DIt = l_vStuff.begin();
+
+	while (DIt != l_vStuff.end()) {
+		SItemW& Item = *DIt;
+
+		if (Item.IType == ZFS_TFOLDER)
+			Item.SubEntries = RecursiveStuffInDirectory(in_sPath + L"\\" + Item.Name);
+
+		++DIt;
+	}
+
+	return l_vStuff;
+}
+
+UINT64 ZDFS::GetSize(std::vector<SItemW>& Items)
+{
+	UINT64 Sz = 0;
+	auto Dit = Items.begin();
+
+	while (Dit != Items.end())
+	{
+		SItemW& Item = *Dit;
+	
+		Sz += Item.FileSzHigh + Item.FileSzLow;
+		if (Item.IType == ZFS_TFOLDER)
+			Sz += GetSize(Item.SubEntries);
+
+		++Dit;
+	}
+
+	return Sz;
 
 }
 

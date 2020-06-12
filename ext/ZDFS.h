@@ -2,6 +2,7 @@
 #pragma comment(lib,"shlwapi.lib")
 #pragma comment(lib,"Shell32.lib")
 #pragma comment(lib,"Ole32.lib")
+
 /*===================================================================== 
 * Introduction:  
 * ZDFS: ZD Filesystem
@@ -10,10 +11,11 @@
 * Wrapper around Win32 API to provide easy filesystem functions in modern
 * C++ stuff
 * ====================
-* Copyright (C) 2018 YOUR MOM GAY LOLOLOL
+* Author: ZDisket
+# Copyright (C) lmao
 * ===================================================================== 
 */
-
+#define ZDFS_MAN_INCLUDE
 #ifdef ZDFS_MAN_INCLUDE
 #include <iostream>
 #include <string>
@@ -21,7 +23,6 @@
 #include <Windows.h>
 #include <Shlwapi.h>
 #include <Shlobj.h>
-#include <Shlobj_core.h>
 
 #endif
 
@@ -30,9 +31,9 @@
 #define RTF_ALLOC_SZ 4096
 #define ALLF "*"
 #define WALLF L"*"
-typedef bool Type;
-#define ZFS_TFOLDER true
-#define ZFS_TFILE false
+typedef short Type;
+#define ZFS_TFOLDER 1
+#define ZFS_TFILE 0
 struct FAttrib {
 	// Note: If this is true, then it shouldn't have any of the other attributes
 	bool Normal;
@@ -76,8 +77,33 @@ struct SItemW // Unicode verstion of struct that indicates anything found by Stu
 	SYSTEMTIME LastAccessTime;
 	SYSTEMTIME LastWriteTime;
 
+	// Only has stuff if it was created by RecursiveStuffInDirectory()
+	std::vector<SItemW> SubEntries;
+
+	SItemW() {
+
+	}
+	SItemW(const SItemW& Copy) {
+		IType = Copy.IType;
+		Name = Copy.Name;
+		Attributes = Copy.Attributes;
+
+		FileSzHigh = Copy.FileSzHigh;
+		FileSzLow = Copy.FileSzLow;
+
+		TimeOfCreation = Copy.TimeOfCreation;
+		LastAccessTime = Copy.LastAccessTime;
+		LastWriteTime = Copy.LastWriteTime;
+
+		SubEntries = Copy.SubEntries;
+	}
+
 };
+
+
+
 //! Alternate name: "I don't like boost::filesystem"
+// 2019 NOTE: THIS SHOULD BE STATIC 
 class ZDFS
 {
 private:
@@ -133,6 +159,17 @@ public:
 	//|-> Filter: Filter string. Default is "*" (all files)
 	//|<- If it fails, returns empty vector
 	std::vector<SItemW> StuffInDirectory(const std::wstring& in_sPath,std::wstring wFilter = WALLF);
+
+	//|> Returns a listing of stuff in the directory specified (Unicode), searching recursively in all subfolders
+	//|!> Note: Includes files and folders
+	//|!> Note: Automatically adds "\\" at the end of string
+	//|-> Filter: Filter string. Default is "*" (all files)
+	//|<- If it fails, returns empty vector
+	std::vector<SItemW> RecursiveStuffInDirectory(const std::wstring& in_sPath, std::wstring wFilter = WALLF);
+
+	//|> Returns the total size of a folder structure, searching recursively
+	//-> Items: The items
+	UINT64 GetSize(std::vector<SItemW>& Items);
 
     // Takes a path from the argument and if possible, returns a full path (ANSI)
 	std::string RelativeToFullPath(const std::string& in_sConvPth);

@@ -21,6 +21,11 @@ Tp IStrStreamConv(const std::wstring& Arg);
 namespace Ui {
 class MainWindow;
 }
+struct cabvr
+{
+    GString abvr;
+    GString cname;
+};
 
 class MainWindow : public QMainWindow
 {
@@ -79,12 +84,19 @@ private slots:
 
     void on_actGoToStrT_triggered();
 
+    void on_actionExport_Region_Control_triggered();
+
 private:
     DBManager Database;
     ZDFS FileSys;
 
-    int maxstrid;
+    void LoadAbvrs();
 
+    vector<cabvr> Abrs;
+    int maxstrid;
+    QTableWidget* twStrTb;
+
+    QString GetStrID(const QString& ids);
     pair<FramelessWindow*,SearchWindow*> pSearchWindow;
     ZTable ZTFromStrEntry(const GString& strename,vector<StrEntry>& strev);
     vector<StrEntry> StrEntryFromZT(ZTable & ztstr);

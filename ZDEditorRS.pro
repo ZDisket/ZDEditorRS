@@ -16,6 +16,9 @@ TEMPLATE = app
 # depend on your compiler). Please consult the documentation of the
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
+DEFINES += _QT
+
+
 # You can also make your code fail to compile if you use deprecated APIs.
 # In order to do so, uncomment the following line.
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
@@ -24,6 +27,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 DEFINES += ZDFS_MAN_INCLUDE
 
 SOURCES += \
+    ext/ByteArr.cpp \
         main.cpp \
         mainwindow.cpp \
     ext/Qt-Frameless-Window-DarkStyle-master/DarkStyle.cpp \
@@ -37,10 +41,12 @@ SOURCES += \
     ext/ZCharScanner.cpp \
     coleditdlg.cpp \
     newcoldlg.cpp \
+    regioncontrol.cpp \
     searchwindow.cpp \
     mulcoldlg.cpp
 
 HEADERS += \
+    ext/ByteArr.h \
         mainwindow.h \
     ext/Delegate.h \
     ext/Signal.h \
@@ -56,6 +62,7 @@ HEADERS += \
     macros.hpp \
     coleditdlg.h \
     newcoldlg.h \
+    regioncontrol.h \
     searchwindow.h \
     mulcoldlg.h
 

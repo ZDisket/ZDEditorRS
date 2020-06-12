@@ -15,7 +15,7 @@
 #include <vector>
 using namespace std;
 using namespace ZDB;
-
+#include "regioncontrol.h"
 #define _Q(s) QString(s)
 #define Status(sta) statusLabel->setText(sta)
 
@@ -50,7 +50,7 @@ ui->splitter->setSizes(QList<int>() << 350 << 200);
            statusProgressBar = new QProgressBar(this);
     QLabel* versionLabel = new QLabel(this);
     gpPgBar = statusProgressBar;
-    versionLabel->setText("V1.4");
+    versionLabel->setText("V1.4B");
            // set text for the label
        statusLabel->setText("Loading to table..........");
           statusLabel->setMinimumSize(QSize(125,12));
@@ -78,6 +78,8 @@ ui->splitter->setSizes(QList<int>() << 350 << 200);
 
           pSearchWindow = make_pair((FramelessWindow*)NULL,(SearchWindow*)NULL);
 
+
+          twStrTb = nullptr;
 
         CheckForAssoc();
 
@@ -1724,5 +1726,165 @@ void MainWindow::on_actGoToStrT_triggered()
     }
 
     Status("Ready");
+
+}
+
+void MainWindow::on_actionExport_Region_Control_triggered()
+{
+    QString sfname = QFileDialog::getSaveFileName(this, tr("Save Region Control"), QString(), tr("Region Control (*.rgc)"));
+
+
+    if (sfname == "")
+        return;
+
+    LoadAbvrs();
+
+
+    // Process countries
+
+    QTableWidget* Cntry = ((GenericTablePage*)ui->tabWidget->widget(findTab("COUNTRY")))->pTable;
+    QTableWidget* Rgion = ((GenericTablePage*)ui->tabWidget->widget(findTab("REGION")))->pTable;
+
+    std::vector<Country> cties;
+    for (int r = 0; r < Cntry->rowCount();++r)
+    {
+        Country ct;
+        ct.id = Cntry->item(r,0)->text().toInt();
+        ct.name = GetStrID(Cntry->item(r,1)->text()).toStdWString();
+        ct.code =  Cntry->item(r,2)->text().replace(" ","").toStdWString();
+
+        for (cabvr& ca : Abrs)
+        {
+            if (ct.code == ca.abvr)
+                ct.name = ca.cname;
+
+
+        }
+        ct.name = QString::fromStdWString(ct.name).replace("\n","",Qt::CaseInsensitive).toStdWString();
+
+
+
+        // Fill regions
+        for (int g = 0; g < Rgion->rowCount();++g)
+        {
+            int cid = Rgion->item(g,3)->text().toInt();
+            if (cid == ct.id){
+                Region rg;
+                rg.id = Rgion->item(g,1)->text().toInt();
+                rg.name = GetStrID(Rgion->item(g,2)->text()).replace("\n","",Qt::CaseInsensitive).replace("\r","",Qt::CaseInsensitive).toStdWString();
+
+                ct.Regions.push_back(rg);
+
+
+            } //  It belongs to the country
+
+
+
+
+        }
+
+
+        cties.push_back(ct);
+
+
+    }
+    RegionControl Rgc;
+    Rgc.SetCountries(cties);
+    Rgc.SaveFile(sfname.toStdWString());
+
+
+
+
+
+}
+
+void MainWindow::LoadAbvrs()
+{
+    QString fnamescv = QFileDialog::getOpenFileName(this, tr("Open CSV to import"), QString(), tr("Comma Separated Variable Files (*.txt)"));
+    ifstream inCSV(fnamescv.toStdWString());
+    vector<GString> inLines;
+    string out_read;
+
+       if (inCSV.good()) {
+           Status("Opening file");
+
+           while (!inCSV.eof()) {
+               getline(inCSV, out_read);
+               inLines.push_back(out_read);
+
+           }
+       }
+
+        for (GString& Line : inLines)
+        {
+            ZStringDelimiter dLine(Line);
+           dLine.AddDelimiter(L"||");
+           if (!dLine.szTokens())
+               continue;
+
+           cabvr abr;
+           abr.abvr = QString::fromStdWString(dLine[1]).replace("\n","",Qt::CaseInsensitive).replace("\r","",Qt::CaseInsensitive).toStdWString();
+           abr.cname = QString::fromStdWString(dLine[0]).replace("\n","",Qt::CaseInsensitive).replace("\r","",Qt::CaseInsensitive).toStdWString();
+
+
+
+           Abrs.push_back(abr);
+
+
+
+
+        }
+
+        SError(QString::number(Abrs.size()));
+
+
+}
+
+QString MainWindow::GetStrID(const QString &ids)
+{
+    if (!twStrTb){
+        const int tcount = ui->tabWidget->count();
+        int tidst = -1;
+
+        for (int t = 0; t < tcount;++t)
+        {
+            if (ui->tabWidget->tabText(t).contains(".gst",Qt::CaseInsensitive))
+                tidst = t;
+
+
+        }
+
+        if (tidst == -1){
+            SError("No string table open. Please open a string table so that it appears on the tab list and try again");
+            return "";
+        }
+
+
+
+        GenericTablePage* Gtp = (GenericTablePage*)ui->tabWidget->widget(tidst);
+        if (!Gtp)
+            return "";
+
+         twStrTb = Gtp->pTable;
+
+    }
+
+
+    for (int r = 0;r < twStrTb->rowCount();++r)
+    {
+        if (twStrTb->item(r,0)->text() == ids){
+            return twStrTb->item(r,1)->text();
+
+
+            break;
+
+        }
+
+
+
+    }
+
+    return "";
+
 
 }

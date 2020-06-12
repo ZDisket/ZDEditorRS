@@ -59,12 +59,8 @@ bool GStringTable::Load(const std::string & in_gstPath)
 			(*sIt).Entry.mString = lStr;
 		}
 		else {
-            wchar_t* dpExtendedBuff = new wchar_t[sIt->Entry.mSize / 2];
-            memset(dpExtendedBuff, 0, sIt->Entry.mSize);
-
-            fread(&dpExtendedBuff, (*sIt).Entry.mSize, 1, stream);
-            sIt->Entry.mString = dpExtendedBuff;
-            delete[] dpExtendedBuff;
+            sIt->Entry.mString.reserve(sIt->Entry.mSize / 2);
+            fread((void*)sIt->Entry.mString.data(),sIt->Entry.mSize,1,stream);
 
 		}
 		++itID;
